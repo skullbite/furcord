@@ -1,0 +1,25 @@
+{
+  "name": "furcord",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "inject": "node injectors",
+    "uninject": "node injectors/uninject.js"
+  },
+  "author": "AstridTheAxo",
+  "license": "ISC",
+  "dependencies": {
+    "@types/electron": "^1.6.10",
+    "electron-devtools-installer": "^3.2.0",
+    "events": "^3.3.0",
+    "tsc": "^2.0.4"
+  },
+  "devDependencies": {
+    "@types/react": "^18.0.17",
+    "@typescript-eslint/eslint-plugin": "^5.33.1",
+    "@typescript-eslint/parser": "^5.33.1",
+    "eslint": "^8.22.0",
+    "eslint-plugin-react": "^7.30.1"
+  }
+}

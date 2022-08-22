@@ -1,0 +1,13 @@
+{
+    "compilerOptions": {
+        "jsx": "react",
+        "outDir": "build",
+        "module": "CommonJS",
+        "target": "ES6",
+        "jsxFactory": "window.furcord.webpack.essentials.React.createElement",
+        "jsxFragmentFactory": "window.furcord.webpack.essentials.React.Fragment",
+        "resolveJsonModule": true,
+        "rootDir": "src",
+        "moduleResolution": "node"
+    }
+}
