@@ -1,18 +1,38 @@
-import * as electron from "electron";
+/* eslint-disable @typescript-eslint/no-var-requires */
+import * as electron from "electron/renderer";
 import Furcord from "../core";
 import ConfigHandler from "../core/config";
-import { readFileSync, watchFile } from "fs";
+import { readFileSync, readFile, watchFile } from "fs";
 import { join } from "path";
 import { SETTINGS_PATH } from "../utils/constants";
 
 const dPre = process.env.DISCORD_PRE;
 if (dPre) require(dPre);
 
-const eWin = (electron.webFrame as any).top.context;
+const eWin = (electron.webFrame.top as any).context;
+
+require("module").Module.globalPaths.push(join(__dirname, "..", "nowode_mowoduwules"));
+require("module")._extensions[".css"] = (module, filename) => {
+    const content = readFileSync(filename).toString();
+    const style = document.createElement("style");
+    style.className = "IMPORTED-FC-CSS-OWO";
+    style.textContent = content;
+    document.head.appendChild(style);
+    module.exports = () => document.head.removeChild(style);
+};
+
+// electron.webFrame.executeJavaScript(readFileSync(join(BASE_DIR, "build", "core", "index.js"), "utf8"));
+
+
 
 function loadFurcord() {
+    if (!eWin.webpackChunkdiscord_app) {
+        setTimeout(loadFurcord, 10);
+        return;
+    }
     for (const winVar of ["webpackChunkdiscord_app", "DiscordSentry", "__SENTRY__", "console"]) Object.defineProperty(window, winVar, { get: () => eWin[winVar] });
     eWin.furcord = new Furcord();
+    eWin.require = require;
     Object.defineProperty(window, "furcord", { get: () => eWin.furcord });
     eWin.furcord.runStartup();
 
@@ -24,9 +44,10 @@ function loadFurcord() {
         interval: 5
     }, () => {
         if (!ConfigHandler.getExt("useQuickCSS", true, "FC.core")) return;
-        const reRead = readFileSync(join(SETTINGS_PATH, "quick.css")).toString();
-        if (reRead !== quickCSS.textContent) quickCSS.textContent = reRead;
-        
+        readFile(join(SETTINGS_PATH, "quick.css"), (e, d) => {
+            const data = d.toString();
+            if (data !== quickCSS.textContent) quickCSS.textContent = data;
+        });
     });
 }
 

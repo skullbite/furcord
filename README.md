@@ -9,3 +9,8 @@ Install dependencies: `npm i`
 Build Source: `npx tsc`
 
 Inject: `npm run inject`
+
+## Development
+```
+npm run build-watch
+```

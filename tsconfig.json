@@ -8,6 +8,14 @@
         "jsxFragmentFactory": "window.furcord.webpack.essentials.React.Fragment",
         "resolveJsonModule": true,
         "rootDir": "src",
-        "moduleResolution": "node"
-    }
+        "moduleResolution": "node",
+        "baseUrl": ".",
+        "paths": {
+            "@owo": ["src/nowode_mowoduwules/@owo"],
+            "@uwu": ["src/nowode_mowoduwules/@uwu"],
+            "@owo/*": ["src/nowode_mowoduwules/@owo/*"],
+            "@uwu/*": ["src/nowode_mowoduwules/@uwu/*"]
+        }
+    },
+    
 }

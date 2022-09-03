@@ -27,6 +27,15 @@ module.exports = {
         "react/display-name": [
             "off"
         ],
+        "react/prop-types": [
+            "off"
+        ],
+        "no-useless-escape": [
+            "off"
+        ],
+        "no-case-declarations": [
+            "off"
+        ],
         "indent": [
             "error",
             4

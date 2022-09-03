@@ -1,35 +1,45 @@
 import * as utils from "../utils";
 import logger from "../utils/logger";
-import Commands from "./apis/commands";
 import ConfigHandler from "./config";
 import funcPatcher from "./funcPatcher";
-import startup from "./startup";
-import Toaster from "./apis/toaster";
-import WebpackHandler from "./webpack";
+import ThemeManager from "./managers/themes";
+import PluginManager from "./managers/plugins";
+import { sendToast } from "@owo/toaster";
+
 
 export default class Furcord {
-    webpack: WebpackHandler;
+    managers: { 
+        themes: ThemeManager,
+        plugins: PluginManager
+    };
     patcher: typeof funcPatcher;
     config: ConfigHandler;
-    commands: Commands;
     logger: typeof logger;
     utils: typeof utils;
-    toaster: Toaster;
 
     constructor() {
-        console.clear();
         utils.logger.log("Initalizing...");
-        this.webpack = new WebpackHandler();
         this.patcher = funcPatcher;
         this.config = new ConfigHandler("FC.core");
-        this.commands = new Commands(this.webpack, this.patcher);
+        // this.commands = new Commands(this.webpack, this.patcher);
         this.utils = utils;
-        this.toaster = new Toaster(this.webpack);
+        this.managers = {
+            themes: new ThemeManager(),
+            plugins: new PluginManager()
+        };
     }
 
-    runStartup() {
-        if (!this.config.get("firstStart", true)) this.toaster.sendToast("Welcome to Furcord! owo", 1, {});
-        startup.forEach(d => d.call(this));
+    async runStartup() {
+        if (this.config.get("firstStart", true)) { 
+            sendToast("Welcome to Furcord! owo", 1, {});
+            this.config.set("firstStart", false);
+        }
+        
+        utils.logger.log("Running startup functions...");
+        const startup = await import("./startup");
+        startup.default.forEach(d => d.call(this));
+        this.managers.themes.init();
+        this.managers.plugins.init();
     }
     
 }
