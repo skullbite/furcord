@@ -1,7 +1,7 @@
 import IconButton from "../IconButton";
 import { getViaDisplayName, getViaProps, essentials } from "@owo/webpack";
 import { open } from "@owo/modals";
-import PluginManager from "src/core/managers/plugins";
+import PluginManager from "../../../../../../src/core/managers/plugins";
 
 import { Plugin } from "@uwu";
 import SettingsErrorBoundary from "./SettingErrorBoundary";
@@ -29,7 +29,7 @@ export default (plugins: PluginManager) => class DataTab extends React.Component
 
         this.state = {
             open: false,
-            isEnabled: pluginsLoaded[this.props.plugin.manifest.dir]
+            isEnabled: pluginsLoaded[this.props.plugin.manifest.dir] && !this.props.plugin.startFailed
         };
     }
     render() {
@@ -55,11 +55,11 @@ export default (plugins: PluginManager) => class DataTab extends React.Component
                     onClick={() => open(() => React.createElement(SettingsErrorBoundary, null, React.createElement(plugin.settings as any, { config: plugin.config })), "large")}
                     tooltip="Open Settings"
                 /> : null }
-                <IconButton
+                { this.state.isEnabled ? <IconButton
                     component={<Retry color="var(--interactive-normal)"/>}
                     onClick={() => plugins.loadPlugin(plugin)}
                     tooltip="Reload Plugin"
-                />
+                /> : null }
                 <div style={{ marginRight: "auto" }}>
                     <b style={{ fontSize: "large", color: "var(--text-normal)" }}>{ plugin.manifest.name }</b>
                     <p style={{ fontSize: "small", color: "var(--text-muted)", marginBottom: "0px", marginTop: "3px" }}>{ plugin.manifest.author }</p>
@@ -69,7 +69,12 @@ export default (plugins: PluginManager) => class DataTab extends React.Component
                     disabled={plugin.startFailed !== undefined}
                     onChange={v => {
                         this.setState({ isEnabled: v });
-                        v ? plugin.start() : plugin.stop();
+                        try {
+                            v ? plugin.start() : plugin.stop();
+                        }
+                        catch (e) {
+                            console.error(`Oh dear... couldn't ${v ? "load" : "unload"} ${plugin.manifest.name}:`, e);
+                        }
                         const pluginsLoaded = plugins.config.get<{ [x: string]: boolean }>("plugins", {});
                         pluginsLoaded[plugin.manifest.dir] = v;
                         plugins.config.set("plugins", pluginsLoaded);

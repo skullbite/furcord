@@ -1,10 +1,3 @@
-declare global {
-    interface Window {
-        __SENTRY__: any,
-        DiscordSentry: any,
-        DiscordNative: any
-    }
-}
 export default () => {
     window.__SENTRY__.hub.addBreadcrumb = () => "uwu";
     window.__SENTRY__.hub.getClient().close();

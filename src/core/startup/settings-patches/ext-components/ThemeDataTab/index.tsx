@@ -1,10 +1,9 @@
-import Theme from "../../../../managers/data/theme";
+import Theme from "../../../../managers/theme";
 import IconButton from "../IconButton";
 import ManifestModal from "./ManifestModal";
 import { getViaDisplayName, getViaProps, essentials } from "@owo/webpack";
 import { open } from "@owo/modals";
-import { shell } from "electron/common";
-import ThemeManager from "src/core/managers/themes";
+import type ThemeManager from "../../../../managers/themes";
 
 const { React } = essentials;
 const { default: Card } = getViaDisplayName("Card");
@@ -76,7 +75,7 @@ export default (themes: ThemeManager) => class DataTab extends React.Component<{
                                 <path d="M15.502 1.94a.5.5 0 0 1 0 .706L14.459 3.69l-2-2L13.502.646a.5.5 0 0 1 .707 0l1.293 1.293zm-1.75 2.456-2-2L4.939 9.21a.5.5 0 0 0-.121.196l-.805 2.414a.25.25 0 0 0 .316.316l2.414-.805a.5.5 0 0 0 .196-.12l6.813-6.814z"/>
                                 <path fillRule="evenodd" d="M1 13.5A1.5 1.5 0 0 0 2.5 15h11a1.5 1.5 0 0 0 1.5-1.5v-6a.5.5 0 0 0-1 0v6a.5.5 0 0 1-.5.5h-11a.5.5 0 0 1-.5-.5v-11a.5.5 0 0 1 .5-.5H9a.5.5 0 0 0 0-1H2.5A1.5 1.5 0 0 0 1 2.5v11z"/>
                             </svg>}
-                            onClick={() => open(() => React.createElement(ManifestModal, theme.data.manifest))}
+                            onClick={() => open(() => React.createElement(ManifestModal, theme.data.manifest), "large")}
                             tooltip="Edit Manifest"
                         /> : null }
                         <IconButton
@@ -85,7 +84,7 @@ export default (themes: ThemeManager) => class DataTab extends React.Component<{
                             </svg> : <svg width="16" height="16" fill="currentColor" className={icon} viewBox="0 0 16 16">
                                 <path d="M.54 3.87.5 3a2 2 0 0 1 2-2h3.672a2 2 0 0 1 1.414.586l.828.828A2 2 0 0 0 9.828 3h3.982a2 2 0 0 1 1.992 2.181l-.637 7A2 2 0 0 1 13.174 14H2.826a2 2 0 0 1-1.991-1.819l-.637-7a1.99 1.99 0 0 1 .342-1.31zM2.19 4a1 1 0 0 0-.996 1.09l.637 7a1 1 0 0 0 .995.91h10.348a1 1 0 0 0 .995-.91l.637-7A1 1 0 0 0 13.81 4H2.19zm4.69-1.707A1 1 0 0 0 6.172 2H2.5a1 1 0 0 0-1 .981l.006.139C1.72 3.042 1.95 3 2.19 3h5.396l-.707-.707z"/>
                             </svg>}
-                            onClick={() => theme.type === "web" ? shell.openExternal(theme.data.url) : shell.openPath(theme.data.path)}
+                            onClick={() => theme.type === "web" ? window.open(theme.data.url) : window.FurcordNative.openPath(theme.data.path)}
                             tooltip="Open Source"
                         />
                         { theme.type === "web" ? <IconButton

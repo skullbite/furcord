@@ -4,16 +4,13 @@ const { React } = essentials;
 const { default: FormSection } = getViaDisplayName("FormSection");
 const { default: SwitchItem } = getViaDisplayName("SwitchItem");
 
-export default (config) => class GeneralSettings extends React.Component {
-    override state: {
-        reactDevTools: boolean
-        transparency: boolean
-    };
+// eslint-disable-next-line @typescript-eslint/ban-types
+export default class GeneralSettings extends React.Component<{}, { reactDevTools: boolean, transparency: boolean }>  {
     constructor(props) {
         super(props);
         this.state = {
-            reactDevTools: config.get("reactDevTools", false) as boolean,
-            transparency: config.get("transparency", false) as boolean
+            reactDevTools: window.extConfig.get("reactDevTools", false),
+            transparency: window.extConfig.get("transparency", false)
         };
     }
     render() {
@@ -27,9 +24,9 @@ export default (config) => class GeneralSettings extends React.Component {
                             Enables react devtools. <b>Requires Restart.</b>
                     </>}
                     value={this.state.reactDevTools}
-                    onChange={() => { 
-                        const t = config.toggle("reactDevTools");
-                        this.setState({ reactDevTools: t });
+                    onChange={async v => { 
+                        window.extConfig.set("reactDevTools", v);
+                        this.setState({ reactDevTools: v });
                     }} 
                 >
                         React Dev Tools
@@ -39,9 +36,9 @@ export default (config) => class GeneralSettings extends React.Component {
                             Enables window transparency. <b>Requires Restart.</b>
                     </>}
                     value={this.state.transparency}
-                    onChange={() => {
-                        const t = config.toggle("transparency");
-                        this.setState({ transparency: t });
+                    onChange={v => {
+                        window.extConfig.set("transparency", v);
+                        this.setState({ transparency: v });
                     }}
                 >
                         Transparency
@@ -50,4 +47,4 @@ export default (config) => class GeneralSettings extends React.Component {
         </>; 
             
     }
-};
+}

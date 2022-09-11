@@ -1,45 +1,18 @@
-import * as utils from "../utils";
-import logger from "../utils/logger";
-import ConfigHandler from "./config";
-import funcPatcher from "./funcPatcher";
-import ThemeManager from "./managers/themes";
-import PluginManager from "./managers/plugins";
-import { sendToast } from "@owo/toaster";
+import { _countModules, essentials, getViaProps } from "@owo/webpack";
 
 
-export default class Furcord {
-    managers: { 
-        themes: ThemeManager,
-        plugins: PluginManager
-    };
-    patcher: typeof funcPatcher;
-    config: ConfigHandler;
-    logger: typeof logger;
-    utils: typeof utils;
-
-    constructor() {
-        utils.logger.log("Initalizing...");
-        this.patcher = funcPatcher;
-        this.config = new ConfigHandler("FC.core");
-        // this.commands = new Commands(this.webpack, this.patcher);
-        this.utils = utils;
-        this.managers = {
-            themes: new ThemeManager(),
-            plugins: new PluginManager()
-        };
+async function loadFurcord() {
+    if (!window.webpackChunkdiscord_app?.push || _countModules() < 7000) {
+        await new Promise(() => setTimeout(loadFurcord, 5));
+        return;
     }
-
-    async runStartup() {
-        if (this.config.get("firstStart", true)) { 
-            sendToast("Welcome to Furcord! owo", 1, {});
-            this.config.set("firstStart", false);
-        }
-        
-        utils.logger.log("Running startup functions...");
-        const startup = await import("./startup");
-        startup.default.forEach(d => d.call(this));
-        this.managers.themes.init();
-        this.managers.plugins.init();
-    }
-    
+    Object.defineProperty(window, "__React", { get: () => essentials.React });
+    const { get, set } = getViaProps("ObjectStorage", "impl").impl;
+    window.config = { get, set };
+    const { default: Furcord } = await import("./furcord");
+    window.furcord = new Furcord();
+    window.furcord.runStartup();
 }
+
+if (document.readyState === "loading") window.document.addEventListener("DOMContentLoaded", loadFurcord);
+else loadFurcord();

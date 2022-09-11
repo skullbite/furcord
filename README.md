@@ -2,13 +2,12 @@
 Discord mod but made by a furry.
 
 ## Installation
-> Currently only availible on Mac OS on Discord Stable.
 
 Install dependencies: `npm i`
 
-Build Source: `npx tsc`
+Build Source: `npm run build`
 
-Inject: `npm run inject`
+Inject: `npm run inject --ptb|canary`
 
 ## Development
 ```

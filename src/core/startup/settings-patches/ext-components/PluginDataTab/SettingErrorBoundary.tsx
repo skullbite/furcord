@@ -14,7 +14,7 @@ export default class SettingsErrorBoundary extends React.Component<{ children: a
         this.setState({ caught: true, error: e });
     }
     render() {
-        return this.state.caught ? <>
+        return this.state.caught ? <div style={{ padding: "20px" }}>
             <FormSection title="Oh dear..." tag="h1">
                 <HelpMessage messageType={2}>
                     { /* eslint-disable-next-line react/no-unescaped-entities */ }
@@ -22,6 +22,6 @@ export default class SettingsErrorBoundary extends React.Component<{ children: a
                     Short Error: {this.state.error.message}
                 </HelpMessage>
             </FormSection>
-        </> : this.props.children;
+        </div> : this.props.children;
     }
 }

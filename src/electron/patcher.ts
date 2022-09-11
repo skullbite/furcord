@@ -1,7 +1,8 @@
 import * as electron from "electron";
-import FurryBrowserWindow from "./electron/BrowserWindow";
+import FurryBrowserWindow from "./BrowserWindow";
 import installExtension, { REACT_DEVELOPER_TOOLS } from "electron-devtools-installer";
-import ConfigHandler from "./core/config";
+import { get } from "./extconfig";
+import "./ipc/main";
 
 let fakeAppSettings;
 Object.defineProperty(global, "appSettings", {
@@ -27,19 +28,18 @@ const newElectron: any = {
 require.cache[electronStuff] = newElectron;
 
 electron.app.whenReady().then(() => {
-    if (ConfigHandler.getExt("reactDevTools", true, "FC.core")) installExtension(REACT_DEVELOPER_TOOLS)
+    if (get("reactDevTools", true)) installExtension(REACT_DEVELOPER_TOOLS)
         .then((name) => console.log(`Added Extension: ${name}`))
         .catch((err) => console.log("An error occurred: ", err));
+});
 
-    electron.session.defaultSession.webRequest.onHeadersReceived(({ responseHeaders, url }, cb) => {
-        if (responseHeaders["content-security-policy"]) delete responseHeaders["content-security-policy"];
-        if (url.endsWith(".css")) responseHeaders["content-type"] = ["text/css"];
-        // responseHeaders["access-control-allow-origin"] = ["*"];
-        cb({ responseHeaders });
-    });
-    electron.session.defaultSession.webRequest.onBeforeRequest(({ url }, cb) => {
-        if (/api\/v(.*)\/science/g.test(url)) cb({ cancel: true });
-        else cb({ });
-    });
-
+electron.session.defaultSession.webRequest.onHeadersReceived(({ responseHeaders, url }, cb) => {
+    if (responseHeaders["content-security-policy"]) delete responseHeaders["content-security-policy"];
+    if (url.endsWith(".css")) responseHeaders["content-type"] = ["text/css"];
+    // responseHeaders["access-control-allow-origin"] = ["*"];
+    cb({ responseHeaders });
+});
+electron.session.defaultSession.webRequest.onBeforeRequest(({ url }, cb) => {
+    if (/api\/v(.*)\/science/g.test(url)) cb({ cancel: true });
+    else cb({ });
 });

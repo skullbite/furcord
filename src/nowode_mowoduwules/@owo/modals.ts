@@ -17,15 +17,14 @@ export function open(component: () => JSX.Element, size: "small" | "medium" | "l
     openModal(modalStuff => essentials.React.createElement(ModalVariables.ModalRoot, {
         ...modalStuff,
         className: "fc-modal"
-    }, essentials.React.createElement("div", {
-        style: { 
-            padding: "20px" 
-        }}, essentials.React.createElement(component, { 
+    }, essentials.React.createElement(component, { 
         size
-    }))));
+    })));
 }
 
 export function close() {
-    const modal = document.querySelector("[role=\"dialog\"]");
-    if (!modal) return;
+    const { useModalStore } = ModalVariables;
+    const { default: modals } = useModalStore.getState();
+    const modalOrder = modals.pop();
+    if (modalOrder) modalOrder.onCloseRequest();
 }

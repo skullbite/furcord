@@ -1,8 +1,6 @@
-import { readFileSync } from "fs";
-import { join } from "path";
-import { ThemeData } from "../themes";
-import * as sass from "sass";
+import { ThemeData } from "./themes";
 
+const { readTheme, compileSass } = window.FurcordNative;
 
 export default class Theme {
     type: "web" | "local";
@@ -15,17 +13,17 @@ export default class Theme {
         this.data = data;
     }
 
-    load() {
+    async load() {
         switch (this.type) {
         case "web":
             this.style.textContent = `@import url(${this.data.url})`;
             break;
         case "local":
             // eslint-disable-next-line no-case-declarations
-            const themePath = join(this.data.path, this.data.theme);
+            const themePath = window.__fileUtils.join(this.data.path, this.data.theme);
             let themeFile: string;
-            if (this.data.theme.endsWith(".scss")) themeFile = sass.compile(themePath).css;
-            else themeFile = readFileSync(themePath).toString();
+            if (this.data.theme.endsWith(".scss")) themeFile = (await compileSass(themePath)).css;
+            else themeFile = await readTheme(themePath);
             this.style.textContent = themeFile;
             break;
         }

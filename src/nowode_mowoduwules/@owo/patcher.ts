@@ -35,6 +35,7 @@ function patch(type: "before" | "after" | "instead", obj: Record<string, any>, f
 }
 
 function makeReplacement(patchInfo: PatchInfo) {
+    if ([].concat(...patchInfo.patches.after, ...patchInfo.patches.before, ...patchInfo.patches.instead).length === 0) return patchInfo.original;
     return function() {
         // eslint-disable-next-line prefer-rest-params
         const args = arguments;

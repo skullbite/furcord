@@ -1,19 +1,19 @@
-import Furcord from "../../..";
+import Furcord from "../../../furcord";
 import DataTab from "../ext-components/ThemeDataTab";
 import { getViaDisplayName, getViaProps, essentials } from "@owo/webpack";
+import { sendToast } from "@owo/toaster";
 
-const { React } = essentials;
+const { React, ThemeStore } = essentials;
 const { default: FormSection } = getViaDisplayName("FormSection");
 const { default: TextInput } = getViaDisplayName("TextInput");
 const { default: Divider } = getViaDisplayName("FormDivider");
 const { marginBottom20, marginTop20 } = getViaProps("marginBottom40");
 const { default: EmptyState } = getViaProps("EmptyStateText"); 
 const { default: Spinner } = getViaDisplayName("Spinner");
-const { default: Button, ButtonSizes } = getViaProps("ButtonColors");
+const { default: Button, ButtonSizes } = getViaProps("Sizes", "Looks", "Hovers", "Colors");
 
 export default function(this: Furcord) {
     const { themes } = this.managers;
-    const { toaster } = this;
     const _DataTab = DataTab(this.managers.themes);
 
     // eslint-disable-next-line @typescript-eslint/ban-types
@@ -40,7 +40,7 @@ export default function(this: Furcord) {
                             this.setState({ addingTheme: true });
                             themes.addThemeFromUrl(target.value)
                                 .catch(e => { 
-                                    toaster.sendToast(e.message, 2, {});
+                                    sendToast(e.message, 2, {});
                                     caught = true;
                                 })
                                 .finally(() => {
@@ -48,7 +48,7 @@ export default function(this: Furcord) {
                                     this.setState({ addingTheme: false });
                                     if (!caught) {
                                         this.forceUpdate();
-                                        toaster.sendToast("Theme successfully added!", 1, {}); 
+                                        sendToast("Theme successfully added!", 1, {}); 
                                     }
                                 });
                         }}
@@ -65,7 +65,7 @@ export default function(this: Furcord) {
                 
                 
                 <Divider className={[marginBottom20, marginTop20].join(" ")}/>
-                { themes.themes.length ? themes.themes.map((t, i) => <_DataTab key={i} theme={t} callback={this.forceUpdate.bind(this)}/>) : <EmptyState>
+                { themes.themes.length ? themes.themes.map((t, i) => <_DataTab key={i} theme={t} callback={this.forceUpdate.bind(this)}/>) : <EmptyState theme={ThemeStore.default.theme}>
                     <EmptyState.Image
                         width={433}
                         height={232}

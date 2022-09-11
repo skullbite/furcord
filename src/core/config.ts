@@ -1,37 +1,22 @@
-import * as fs from "fs";
-import { SETTINGS_PATH } from "../utils/constants";
-import { join } from "path";
-
 type basicJsonTypes = boolean | string | number | any[];
+
 export default class ConfigHandler {
     private data: Record<string, any> = {};
     configName: string;
 
-    static getExt(key: string, defaultValue: basicJsonTypes, path: string) {
-        if (fs.existsSync(join(SETTINGS_PATH, path+".json"))) {
-            try {
-                const configPath = JSON.parse(fs.readFileSync(join(SETTINGS_PATH, path+".json")).toString());
-                return configPath[key] === undefined ? defaultValue : configPath[key];
-            }
-            catch {
-                return defaultValue;
-            }
-        }
-        else return defaultValue;
-    }
-
     constructor(targetConf: string, waitUntilUsed = false) {
-        this.configName = targetConf+".json";
-        if (fs.existsSync(join(SETTINGS_PATH, this.configName))) {
-            try {
-                this.data = require(join(SETTINGS_PATH, this.configName));
+        this.configName = targetConf;
+        try {
+            const data = window.config.get<undefined | string>(targetConf, undefined);
+            if (!data) {
+                this.data = {};
+                if (!waitUntilUsed) window.config.get(targetConf, "{}");
             }
-            catch {
-                fs.writeFileSync(join(SETTINGS_PATH, this.configName), "{}");
-            }
+            else this.data = JSON.parse(data);
         }
-        else {
-            if (!waitUntilUsed) fs.writeFileSync(join(SETTINGS_PATH, this.configName), "{}"); 
+        catch {
+            this.data = {};
+            window.config.get(targetConf, "{}");
         }
     }
 
@@ -46,7 +31,7 @@ export default class ConfigHandler {
 
     set<T = basicJsonTypes>(key: string, value: T) {
         this.data[key] = value;
-        fs.writeFileSync(join(SETTINGS_PATH, this.configName), JSON.stringify(this.data));
+        window.config.set(this.configName, JSON.stringify(this.data));
     }
 
     toggle(key: string) {

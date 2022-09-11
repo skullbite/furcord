@@ -1,8 +1,10 @@
-import { readdirSync } from "fs";
-import { join } from "path";
-import { THEME_PATH } from "../../utils/constants";
-import Theme from "./data/theme";
+import Theme from "./theme";
 import ManagerBase from "./manager";
+
+const { readTheme, readThemeDir } = window.FurcordNative;
+const { join, paths } = window.__fileUtils;
+const { THEME_PATH } = paths;
+
 
 export interface ThemeData {
     url?: string,
@@ -37,16 +39,16 @@ export default class ThemeManager extends ManagerBase {
             this.themes.push(theme);
         });
     }
-    loadLocalThemes() {
-        const localThemeArray = readdirSync(THEME_PATH);
+    async loadLocalThemes() {
+        const localThemeArray = await readThemeDir();
         const localThemes = this.config.get("localThemes", {});
-        localThemeArray.forEach(d => {
-            if (d === ".DS_Store") return;
-            const themePath = readdirSync(join(THEME_PATH, d));
+        localThemeArray.forEach(async (d: string) => {
+            if (d.startsWith("")) return;
+            const themePath = await readTheme(d);
+            
             const manifestFile = themePath.find(f => ["powercord_manifest.json", "manifest.json"].includes(f));
             if (!manifestFile) return;
-            // eslint-disable-next-line @typescript-eslint/no-var-requires
-            const { name, description, author, theme } = require(join(THEME_PATH, d, manifestFile));
+            const { name, description, author, theme } = require(join(THEME_PATH, d, manifestFile)) as any;
             if (typeof localThemes[d] !== "boolean") localThemes[d] = true;
 
             const _theme = new Theme("local", {
@@ -65,14 +67,13 @@ export default class ThemeManager extends ManagerBase {
 
     }
 
-    reloadLocalThemes() {
+    /*reloadLocalThemes() {
         const localThemeArray = readdirSync(THEME_PATH);
         const localThemes = this.config.get("localThemes", {});
         localThemeArray.forEach(d => {
             const themePath = readdirSync(join(THEME_PATH, d));
             const manifestFile = themePath.find(f => ["powercord_manifest.json", "manifest.json"].includes(f));
             if (!manifestFile) return;
-            // eslint-disable-next-line @typescript-eslint/no-var-requires
             const { name, description, author, theme } = require(join(THEME_PATH, d, manifestFile));
             if (typeof localThemes[d] !== "boolean") localThemes[d] = true;
 
@@ -89,7 +90,7 @@ export default class ThemeManager extends ManagerBase {
             if (localThemes[d]) _theme.load();
             this.themes.push(_theme);
         });
-    }
+    }*/
     async addThemeFromUrl(url: string) {
         // nah this regex stuff is annoying
         // if (!/^https?:\/\/(?:www\.)?[-a-zA-Z0-9@:%._\+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b(?:[-a-zA-Z0-9()@:%_\+.~#?&\/=]*)$/g.test(url) || 

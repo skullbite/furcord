@@ -1,0 +1,16 @@
+{
+    "compilerOptions": {
+        "module": "CommonJS",
+        "jsx": "react",
+        "target": "ES6",
+        "baseUrl": "./nowode_mowoduwules",
+        "paths": {
+            "@owo": ["@owo"],
+            "@uwu": ["@uwu"],
+            "@owo/*": ["@owo/*"],
+            "@uwu/*": ["@uwu/*"]
+        },
+        "typeRoots": ["./types.d.ts", "../node_modules/@types"]
+    },
+    "include": ["./**/*"]
+}

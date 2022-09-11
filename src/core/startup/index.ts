@@ -1,4 +1,13 @@
-import * as fs from "fs";
+import quickCssCodeblock from "./quick-css-codeblock";
+import errorBoundaryTweak from "./error-boundary-tweak";
+import settingsPatches from "./settings-patches";
+import killTracking from "./kill-tracking";
+import shutUp from "./shut-up";
 
-// eslint-disable-next-line @typescript-eslint/no-var-requires
-export default fs.readdirSync(__dirname).filter(d => d !== "index.js").map(d => require(`./${d}`).default) as unknown as (() => void)[];
+export default [
+    quickCssCodeblock,
+    errorBoundaryTweak,
+    settingsPatches,
+    killTracking,
+    shutUp
+];
