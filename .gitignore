@@ -3,7 +3,4 @@ build
 node_modules
 package-lock.json
 .settings
-addons/plugins/*
-!addons/plugins/.owo
-addons/themes/*
-!addons/themes/.uwu
+addons

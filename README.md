@@ -7,8 +7,8 @@ Install dependencies: `npm i`
 
 Build Source: `npm run build`
 
-Inject: `npm run inject [--ptb|canary]`
+Inject: `npm run inject [-- --ptb|canary]`
 
 ## Uninstallation
 
-Uninject: `npm run uninject [--ptb|canary]`
+Uninject: `npm run uninject [-- --ptb|canary]`

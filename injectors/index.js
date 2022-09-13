@@ -47,11 +47,17 @@ if (coreIndex.split("\n").length != 1) {
 }
 else {
     if (uninject) { 
-        console.log(red("|") + " Nothing's injected...");
+        console.error(red("|") + " Nothing's injected...");
         process.exit();
     }
 }
 
+if (!uninject && !fs.existsSync(join(__dirname, "..", "addons"))) {
+    console.log(blue("|") + " Creating extra folders...");
+    fs.mkdirSync(join(__dirname, "..", "addons"));
+    fs.mkdirSync(join(__dirname, "..", "addons", "plugins"));
+    fs.mkdirSync(join(__dirname, "..", "addons", "themes"));
+}
 fs.writeFile(completePath, uninject ? "module.exports = require('./core.asar');" : rewrittenCode, (err) => {
     if (err) {
         console.error(`${red("|")} Failed to ${unPrefix}inject furcord.${platform === "linux" ? " You might need to use sudo." : ""}`);
