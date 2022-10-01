@@ -8,10 +8,11 @@ const { platform, env, argv } = process;
 
 const uninject = argv.includes("--uninject");
 const unPrefix = uninject ? "un" : "";
-console.log(`${blue("|")} Furcord v${package.version}\n${blue("|")} Detected OS: ${process.platform}`);
+console.log(`${blue("|")} Furcord v${package.version}`);
 let target = "stable";
 const altTarget = ["--stable", "--ptb", "--canary"].find(flag => argv.some(arg => arg.toLowerCase() === flag));
 if (altTarget && ["--stable", "--ptb", "--canary"].some(flag => flag === altTarget.toLowerCase())) target = altTarget.toLowerCase().replace("--", "");
+console.log(`${blue("|")} Target: ${target} ~ OS: ${process.platform}`);
 
 if (!fs.existsSync(join(__dirname, "..", "build")) || !fs.existsSync(join((__dirname, "..", "node_modules")))) {
     console.error(red("|") + " Missing dependencies. Please read the README.md installation section.");
@@ -52,12 +53,6 @@ else {
     }
 }
 
-if (!uninject && !fs.existsSync(join(__dirname, "..", "addons"))) {
-    console.log(blue("|") + " Creating extra folders...");
-    fs.mkdirSync(join(__dirname, "..", "addons"));
-    fs.mkdirSync(join(__dirname, "..", "addons", "plugins"));
-    fs.mkdirSync(join(__dirname, "..", "addons", "themes"));
-}
 fs.writeFile(completePath, uninject ? "module.exports = require('./core.asar');" : rewrittenCode, (err) => {
     if (err) {
         console.error(`${red("|")} Failed to ${unPrefix}inject furcord.${platform === "linux" ? " You might need to use sudo." : ""}`);

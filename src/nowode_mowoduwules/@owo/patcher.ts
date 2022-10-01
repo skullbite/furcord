@@ -13,24 +13,28 @@ function patch(type: "before" | "after" | "instead", obj: Record<string, any>, f
     if (!obj || !obj[func]) throw new TypeError(`'${func}' is undefined!`);
     let patchInfo: PatchInfo = obj[func][patchInfoSym];
     if (!patchInfo) {
+        const theOgFunc = Object.freeze(obj[func]);
         patchInfo = { 
             patches: {
                 before: [],
                 after: [],
                 instead: []
             }, 
-            original: obj[func] 
+            original: theOgFunc
         };
         
         obj[func][patchInfoSym] = patchInfo;
-        Object.defineProperties(obj[func], Object.getOwnPropertyDescriptors(patchInfo.original));
-        obj[func].toString = () => patchInfo.original.toString();
+        const descriptors = Object.getOwnPropertyDescriptors(patchInfo.original);
+        const keys = {};
+        for (const x of Object.keys(descriptors)) Object.defineProperty(keys[func], x, descriptors[x].value);
+        obj[func] = [];
+        // obj[func].toString = () => patchInfo.original.toString();
     }
     patchInfo.patches[type].push(patch);
     obj[func] = makeReplacement(patchInfo);
     return () => {
         patchInfo.patches[type].splice(patchInfo.patches[type].findIndex(patch), 1);
-        makeReplacement(patchInfo);
+        Object.defineProperty(obj, func, makeReplacement(patchInfo));
     };
 }
 

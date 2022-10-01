@@ -6,7 +6,7 @@ export interface PluginManifest {
     description: string,
     author: string,
     run: string,
-    dir: string
+    shortName: string
 }
 
 export default class Plugin {
@@ -15,7 +15,7 @@ export default class Plugin {
     settings?: () => React.Component<{ config: ConfigHandler }> | React.PureComponent<{ config: ConfigHandler }> | JSX.Element;
     startFailed?: Error;
     constructor(manifest) {
-        this.config = new ConfigHandler(`${this.constructor.name}.plugin`, true);
+        this.config = new ConfigHandler(`${manifest.shortName}.plugin`, true);
         this.manifest = manifest;
     }
 

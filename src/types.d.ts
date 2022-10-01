@@ -16,6 +16,8 @@ declare global {
             push: (chunk) => any;
             pop: () => any;
         };
+        owo: typeof import("./nowode_mowoduwules/@owo");
+        uwu: typeof import("./nowode_mowoduwules/@uwu");
         __SENTRY__: any;
         __fileUtils: {
             existsSync: (path: string) => boolean;

@@ -9,21 +9,25 @@ interface CommandOptions {
 }
 
 const fcSectionData = {
-    id: "-69",
-    type: 0,
-    get name() {
-        return "Furcord";
-    },
+    id: "1019639596910379122",
+    type: 1,
+    name: "Furcord",
     get icon() {
-        return "https://cdn.discordapp.com/app-icons/695490578192007219/637560c9423e4b0b2ce048b2a0f976df.png?size=256";
+        return "490e5d6034d89b62b185587825b62a01";
+    },
+    bot: {
+        username: "Furcord",
+        id: "1019639596910379122",
+        bot: true,
+        discriminator: "3970"
     }
 };
 
 const { BUILT_IN_SECTIONS } = getViaProps("BUILT_IN_COMMANDS");
 const { BuiltInSectionId } = getViaProps("BuiltInSectionId");
 
-BuiltInSectionId.OWO = "-69";
-BUILT_IN_SECTIONS[-69] = fcSectionData;
+BuiltInSectionId.OWO = "1019639596910379122";
+BUILT_IN_SECTIONS["1019639596910379122"] = fcSectionData;
 
 export function addCommand({ name, description="", execute, options=[] }: {
     name: string,
@@ -35,7 +39,7 @@ export function addCommand({ name, description="", execute, options=[] }: {
     if (BUILT_IN_COMMANDS.map(d => d.name).includes(name)) throw new TypeError(`Command '${name}' is already registered.`);
     BUILT_IN_COMMANDS.push({
         id: String(Math.min(...BUILT_IN_COMMANDS.map(d => Number(d.id))) - 1),
-        applicationId: "-69",
+        applicationId: "1019639596910379122",
         inputType: 0,
         type: 1,
         name,

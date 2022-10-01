@@ -23,8 +23,8 @@ export function open(component: () => JSX.Element, size: "small" | "medium" | "l
 }
 
 export function close() {
-    const { useModalStore } = ModalVariables;
-    const { default: modals } = useModalStore.getState();
+    const { useModalsStore } = getViaProps("useModalsStore");
+    const { default: modals } = useModalsStore.getState();
     const modalOrder = modals.pop();
     if (modalOrder) modalOrder.onCloseRequest();
 }

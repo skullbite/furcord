@@ -1,20 +1,26 @@
 /* eslint-disable @typescript-eslint/no-var-requires */
 const { build } = require("esbuild");
 const { join } = require("path");
-const { watch } = require("fs");
+const { watch, readdirSync, existsSync, readFileSync, mkdirSync } = require("fs");
+const { inspect } = require("util");
 
-
-/*const pluginRequireFix = {
+if (!existsSync(__dirname, "addons")) {
+    mkdirSync(join(__dirname, "..", "addons"));
+    mkdirSync(join(__dirname, "..", "addons", "plugins"));
+    mkdirSync(join(__dirname, "..", "addons", "themes"));
+}
+    
+const pluginRequireFix = {
     name: "pluginsyay",
     setup: build => {
-        build.onResolve({ filter: /.* }, args => {
+        build.onResolve({ filter: /.*/ }, args => {
             return {
                 namespace: "ploogs",
                 path: args.path
             };
         });
 
-        build.onLoad({ filter: /.*, namespace: "ploogs" }, args => {
+        build.onLoad({ filter: /.*/, namespace: "ploogs" }, args => {
             const dir = args.path.split("/").pop();
 
             const pluginDir = readdirSync(args.path);
@@ -23,16 +29,11 @@ const { watch } = require("fs");
             for (const y of ["name", "description", "author", "run"]) {
                 if (!manifest[y]) throw new Error(`${dir}: Manifest is missing required key ${y}`);
             }
+            manifest.shortName = dir;
             if (!existsSync(join(args.path, manifest.run))) throw new Error("Couldn't find an entry point");
             let file = readFileSync(join(args.path, manifest.run), "utf8");
-            file = file.replace(/require\s?\(("|')@(owo|uwu)(\/.*)?("|')\)/g, (...args) => `window.${args[2]}${args[3] ? args[3].replace(/\//g, ".") : ""}`);
-            file = file.replace(/\.\//g, join(args.path, "/"));
-            console.log(file);
-            const mid = /(\.\.\/)/g.exec(file);
-            if (mid) {
-                console.log(mid);
-                // file = file.replace(/(\.\.\/)/g);
-            }
+            file = `(()=>{const exports = { manifest: ${inspect(manifest)} };\n` + file;
+            file += "\nreturn exports;})()";
 
 
             // const files = readdirSync(args.path);
@@ -52,16 +53,16 @@ const { watch } = require("fs");
                 file = file.replace(/require\s?\(("|')@(owo|uwu)(\/.*)?("|')\)/g, (...args) => `window.${args[2]}${args[3] ? args[3].replace(/\//g, ".") : ""}`);
                 code += file;
 
-            }
-
+            }*/
+            
             return {
-                contents: file
-                // resolveDir: join(__dirname, "src", "nowode_mowoduwules")
+                contents: file,
+                resolveDir: join(__dirname, "src", "nowode_mowoduwules", "index.ts")
             };
         });
 
     }
-};*/
+};
 
 const modulesPlugin = {
     name: "modules",
@@ -73,12 +74,13 @@ const modulesPlugin = {
             };
         });
 
-        build.onLoad({ filter: /nowode_mowoduwules\/@owo/, namespace: "fc-modules" }, () => {
+        build.onLoad({ filter: /nowode_mowoduwules\/@owo\/index\.ts/, namespace: "fc-modules" }, () => {
+            
             return {
                 contents: "module.exports = window.owo;window.owo = module.exports;"
             };
         });
-        build.onLoad({ filter: /nowode_mowoduwules\/@uwu/, namespace: "fc-modules" }, () => {
+        build.onLoad({ filter: /nowode_mowoduwules\/@uwu\/index\.ts/, namespace: "fc-modules" }, () => {
             return {
                 contents: "module.exports = window.uwu;window.uwu = module.exports;"
             };
@@ -92,7 +94,7 @@ function buildStuff() {
         outfile: "build/owo.min.js",
         banner: { js: "/* hi owo */" },
         bundle: true,
-        minify: true,
+        // minify: true,
         jsxFactory: "__React.createElement",
         jsxFragment: "__React.Fragment",
         plugins: [modulesPlugin],
@@ -120,19 +122,22 @@ function buildStuff() {
         external: ["electron"], 
         logLevel: "info"
     });
-    /*for (const x of readdirSync(join(__dirname, "..", "addons", "plugins"))) { 
+    for (const x of readdirSync(join(__dirname, "addons", "plugins"))) { 
         if (x === "owo") continue;
         build({
-            entryPoints: [join(__dirname, "..", "addons", "plugins", x)],
+            entryPoints: [join(__dirname, "addons", "plugins", x)],
             external: ["@owo", "@uwu"],
             outfile: `build/plugins/${x}.js`,
-            format: "iife",
+            format: "cjs",
             platform: "browser",
             bundle: true,
-            // write: true,
-            // plugins: [pluginRequireFix]
+            minify: true,
+            write: true,
+            jsxFactory: "__React.createElement",
+            jsxFragment: "__React.Fragment",
+            plugins: [pluginRequireFix]
         });
-    }*/
+    }
 }
 
 
@@ -140,7 +145,7 @@ if (process.argv.includes("--watch")) {
     console.clear();
     console.log("Watcher started owo");
     watch(__dirname, { recursive: true }, (_, filename) => {
-        if ([".git", "injectors", "build"].some(d => filename.includes(d))) return;
+        if ([".git", "injectors", "build", "addons"].some(d => filename.includes(d))) return;
         console.clear();
         try {
             buildStuff();

@@ -24,6 +24,6 @@ export default class Furcord {
         const startup = await import("./startup");
         startup.default.forEach(d => d.call(this));
         this.managers.themes.init();
-        // this.managers.plugins.init();
+        this.managers.plugins.init();
     }
 }

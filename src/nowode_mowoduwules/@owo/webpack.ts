@@ -1,5 +1,5 @@
 let modules = [];
-function filterWebpack() {
+function filterWebpack(predicate: (module: any) => boolean, returnFirst=true) {
     window.webpackChunkdiscord_app.push([[Symbol.for("webpack.owo")], [], ({ c }: { c: [] }) => {
         if (modules.length !== c.length) modules = c;
     }]);
@@ -8,57 +8,48 @@ function filterWebpack() {
     for (const key in modules) {
         const mod = modules[key].exports;
         if (!mod) continue;
-        mods.push(mod);
+        if (predicate(key)) {
+            if (returnFirst) return mod;
+            mods.push(mod);
+        }
     }
-    return mods;
+    return returnFirst ? undefined : mods;
 }
 export function _countModules() {
-    return filterWebpack().length;
+    return filterWebpack(() => true).length;
 }
 
 export function getModule(predicate: (obj) => boolean) {
-    const modules = filterWebpack();
-    for (const x of modules) {
-        if (predicate(x)) return x;
-    }
+    return filterWebpack(predicate);
 }
 
 export function getAllModules(predicate: (obj) => boolean) {
-    const modules = filterWebpack();
-    const toRet = [];
-    for (const x of modules) {
-        if (predicate(x)) toRet.push(x);
-    }
-    return toRet;
+    return filterWebpack(predicate, false);
 }
 
 export function getViaDisplayName(name: string) {
-    const modules = filterWebpack();
-    for (const x of modules) {
-        if (x.displayName === name || x.default?.displayName == name) return x;
-    }
+    return filterWebpack(m => m.displayName === name || m.default?.displayName === name);
 }
 
 export function getViaProps(...props: string[]) {
-    const modules = filterWebpack();
-    for (const x of modules) {
+    return filterWebpack(m => {
         let propCount = 0;
         for (const p of props) {
-            if (x[p] || x.default?.[p]) propCount++;
+            if (m[p] || m.default?.[p]) propCount++;
         }
-        if (propCount === props.length) return x;
-    }
+        return propCount === props.length;
+    }, true);
+    
 }
 
 export function getViaPrototypes(...protos: string[]) {
-    const modules = filterWebpack();
-    for (const x of modules) {
+    return filterWebpack(m => {
         let protoCount = 0;
         for (const p of protos) {
-            if (x.prototype?.[p] || x.default?.prototype?.[p] || x.__proto__?.[p] || x.default?.__proto__?.[p]) protoCount++;
+            if (m.prototype?.[p] || m.default?.prototype?.[p] || m.__proto__?.[p] || m.default?.__proto__?.[p]) protoCount++;
         }
-        if (protoCount === protos.length) return x;
-    }
+        return protoCount === protos.length;
+    });
 }
 
 export const essentials: {

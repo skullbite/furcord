@@ -1,7 +1,7 @@
 import IconButton from "../IconButton";
 import { getViaDisplayName, getViaProps, essentials } from "@owo/webpack";
 import { open } from "@owo/modals";
-import PluginManager from "../../../../../../src/core/managers/plugins";
+import type PluginManager from "../../../../../../src/core/managers/plugins"; // 😩
 
 import { Plugin } from "@uwu";
 import SettingsErrorBoundary from "./SettingErrorBoundary";
@@ -29,7 +29,7 @@ export default (plugins: PluginManager) => class DataTab extends React.Component
 
         this.state = {
             open: false,
-            isEnabled: pluginsLoaded[this.props.plugin.manifest.dir] && !this.props.plugin.startFailed
+            isEnabled: pluginsLoaded[this.props.plugin.manifest.shortName] && !this.props.plugin.startFailed
         };
     }
     render() {
@@ -57,7 +57,7 @@ export default (plugins: PluginManager) => class DataTab extends React.Component
                 /> : null }
                 { this.state.isEnabled ? <IconButton
                     component={<Retry color="var(--interactive-normal)"/>}
-                    onClick={() => plugins.loadPlugin(plugin)}
+                    onClick={() => plugins.unloadPlugin(plugin.manifest.shortName, true).then(() => this.forceUpdate())}
                     tooltip="Reload Plugin"
                 /> : null }
                 <div style={{ marginRight: "auto" }}>
@@ -69,24 +69,15 @@ export default (plugins: PluginManager) => class DataTab extends React.Component
                     disabled={plugin.startFailed !== undefined}
                     onChange={v => {
                         this.setState({ isEnabled: v });
-                        try {
-                            v ? plugin.start() : plugin.stop();
-                        }
-                        catch (e) {
-                            console.error(`Oh dear... couldn't ${v ? "load" : "unload"} ${plugin.manifest.name}:`, e);
-                        }
-                        const pluginsLoaded = plugins.config.get<{ [x: string]: boolean }>("plugins", {});
-                        pluginsLoaded[plugin.manifest.dir] = v;
-                        plugins.config.set("plugins", pluginsLoaded);
+                        const name = plugin.manifest.shortName;
+                        v ? plugins.loadPlugin(name + ".js", true) : plugins.unloadPlugin(name);
                     }}
                 />
             </div>
             { this.state.open ?
                 <>
                     <Divider className={[marginTop20, marginBottom8].join(" ")}/>
-                    { /*<p style={{ fontSize: "small", color: "var(--text-muted)", marginBottom: "0px", marginTop: "3px" }}>{ theme.manifest.manifest.description }</p> */ }
                     <Text>{ plugin.manifest.description }</Text>
-                   
                 </>
                 : null }
         </Card>;

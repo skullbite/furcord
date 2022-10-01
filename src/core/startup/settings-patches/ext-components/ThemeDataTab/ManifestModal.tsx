@@ -5,9 +5,9 @@ import { ThemeData } from "../../../../managers/themes";
 const { React } = essentials;
 const { Heading } = getViaProps("Heading");
 const { justifyBetween } = getViaProps("justifyBetween", "flex");
-const { default: FormSection } = getViaDisplayName("FormSection");
 const { default: TextInput } = getViaDisplayName("TextInput");
 const { default: Button, ButtonSizes } = getViaProps("ButtonColors", "ButtonLink");
+const { default: FormItem } = getViaDisplayName("FormItem");
 
 export default class ManifestModal extends React.Component<ThemeData["manifest"], { nameInvalid: boolean, authorInvalid: boolean, descriptionInvalid: boolean }> {
     data: this["props"];
@@ -36,19 +36,26 @@ export default class ManifestModal extends React.Component<ThemeData["manifest"]
        
             <ModalComponents.Content>
                 <div style={{ padding: "10px" }}>
-                    <FormSection title="Name" error={this.state.nameInvalid ? "Invalid Name" : ""}>
+                    <TextInput
+                        name="Name"
+                        onKeyDown={({ target }) => console.log(target.value)}
+                        value={this.data.name}
+                        editable={true}
+                    />
+
+                    <FormItem title="Name" error={this.state.nameInvalid ? "Invalid Name" : undefined}>
                         <TextInput
                             name="Name"
                             onKeyDown={({ target }) => console.log(target.value)}
                             value={this.data.name}
                         />
-                    </FormSection>
-                    <FormSection title="Author" {...(this.state.authorInvalid ? { error: "Invalid Author" } : {})}>
+                    </FormItem>
+                    <FormItem title="Author" {...(this.state.authorInvalid ? { error: "Invalid Author" } : {})}>
                         <TextInput value={this.data.author}/>
-                    </FormSection>
-                    <FormSection title="Description" {...(this.state.descriptionInvalid ? { error: "Invalid Description" } : {})}>
+                    </FormItem>
+                    <FormItem title="Description" {...(this.state.descriptionInvalid ? { error: "Invalid Description" } : {})}>
                         <TextInput value={this.data.description}/>
-                    </FormSection>
+                    </FormItem>
                 </div>
             </ModalComponents.Content>
             <ModalComponents.Footer>
